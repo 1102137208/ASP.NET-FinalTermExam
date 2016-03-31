@@ -1,0 +1,83 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/_LayoutOorderPage.cshtml";
+}
+<script type="text/javascript">
+    var Submit = function () {
+        $.ajax({
+            url: "/GetOrder/Index",
+            type: "POST",
+            data: $('#orderForm').serialize(),
+            dataType: "JSON",
+            success: function (msg) {
+                $('#resultTable').children().remove();
+                $('#resultTable').append("<tr><td>訂單編號</td><td>客戶名稱</td><td>訂購日期</td><td>出貨日期</td></tr>");
+                var date;
+                $.each(msg, function (i, item) {
+                    date = new Date(parseInt(item.OrderDate.substr(6)));
+                    item.OrderDate = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+                    if (item.ShippedDate != null) {
+                        date = new Date(parseInt(item.ShippedDate.substr(6)));
+                        item.ShippedDate = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+                    }
+                    $('#resultTable').append("<tr><td>" + item.OrderID + "</td><td>" + item.CustomerName +
+                                                "</td><td>" + item.OrderDate + "</td><td>" + item.ShippedDate + "</td></tr>");
+                });
+            },
+            error: function (xhr) {
+                alert(xhr.status);
+            }
+        });
+    }
+</script>
+
+<h3>訂單查詢</h3>
+<div class="container">
+    <form id="orderForm">
+        <table class="table table-bordered">
+            <tr>
+                <td>訂單編號</td>
+                <td colspan="4"><input type="text" id="OrderID" name="OrderID"></td>
+            </tr>
+            <tr>
+                <td>客戶名稱</td>
+                <td colspan="4"><input type="text" id="CustomerName" name="CustomerName"></td>
+            </tr>
+            <tr>
+                <td>負責員工</td>
+                <td colspan="4">
+                    @Html.DropDownList("EmployeeID", (List<SelectListItem>)ViewBag.empData, string.Empty)
+                </td>
+            </tr>
+            <tr>
+                <td>出貨公司</td>
+                <td colspan="4">
+                    @Html.DropDownList("ShipperID", (List<SelectListItem>)ViewBag.shipperData, string.Empty)
+                </td>
+            </tr>
+            <tr>
+                <td>訂購日期</td>
+                <td><input type="date" id="OrderDate" name="OrderDate"></td>
+                <td>出貨日期</td>
+                <td><input type="date" id="ShippedDate" name="ShippedDate"></td>
+            </tr>
+            <tr>
+                <td>需要日期</td>
+                <td colspan="4"><input type="date" id="RequireDate" name="RequireDate"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="4">
+                    <input type="button" value="查詢" onclick="Submit()">
+                    <input type="reset" value="刪除">
+                    <button>新增訂單</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <div>
+        <table id="resultTable" class="table table-bordered"></table>
+    </div>
+</div>
