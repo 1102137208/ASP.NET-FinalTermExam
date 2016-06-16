@@ -1,0 +1,262 @@
+﻿@model WebApplication1.Models.Order
+@{
+    ViewBag.Title = "InsertPage";
+    Layout = "~/Views/_LayoutOorderPage.cshtml";
+}
+<!-- Insert Order -->
+<div class="insertOrder">
+    <h3>新增訂單</h3>
+    @using (Html.BeginForm("DoInsert", "GetOrder", FormMethod.Post, new { @id = "insertForm" }))
+    {
+        @Html.AntiForgeryToken()
+        <table class="table table-bordered">
+            <tr>
+                <td>
+                    客戶名稱<span style="color:red">*</span>
+                <td colspan="4">
+                    <input type="text" id="CustomerID" name="CustomerID" required validationMessage="Enter {0}" />
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    負責員工姓名<span style="color:red">*</span>
+                <td colspan="4">
+                    <input type="text" id="EmployeeID" name="EmployeeID" required validationMessage="Enter {0}" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    訂單日期<span style="color:red">*</span>
+                </td>
+                <td>
+                    <input type="text" data-role='datepicker' id="OrderDate" class="OrderDate" name="OrderDate" data-type="date" required="required" />
+                    <span class="k-invalid-msg" data-for="OrderDate"></span>
+                </td>
+                <td>
+                    需要日期<span style="color:red">*</span>
+                </td>
+                <td>
+                    <input type="text" data-role='datepicker' id="RequiredDate" data-type="date" class="RequiredDate" name="RequiredDate" data-greaterdate-field="OrderDate" data-greaterdate-msg='需要日期必須在訂購日期之後' required="required" />
+                    <span data-for='RequiredDate' class='k-invalid-msg'></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    出貨日期<span style="color:red">*</span>
+                </td>
+                <td>
+                    <input type="text" data-role='datepicker' id="ShippedDate" data-type="date" class="ShippedDate" name="ShippedDate" required="required" />
+                    <span data-for='ShippedDate' class='k-invalid-msg'></span>
+                </td>
+                <td>
+                    出貨公司名稱<span style="color:red">*</span>
+                </td>
+                <td colspan="4">
+                    <input type="text" id="ShipperID" name="ShipperID" required validationMessage="Enter {0}" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    運費
+                </td>
+                <td>
+                    <input type="text" id="Freight" name="Freight" class="k-textbox" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    出貨國家
+                </td>
+                <td>
+                    <input type="text" id="ShipCountry" name="ShipCountry" class="k-textbox" />
+                </td>
+                <td>
+                    出貨城市
+                </td>
+                <td>
+                    <input type="text" id="ShipCity" name="ShipCity" class="k-textbox" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    出貨地區
+                </td>
+                <td>
+                    <input type="text" id="ShipRegion" name="ShipRegion" class="k-textbox" />
+                </td>
+                <td>
+                    郵遞區號
+                </td>
+                <td>
+                    <input type="text" id="ShipPostalCode" name="ShipPostalCode" class="k-textbox" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    出貨地址
+                </td>
+                <td>
+                    <input type="text" id="ShipAddress" name="ShipAddress" class="k-textbox" />
+                </td>
+                <td>
+                    出貨說明
+                </td>
+                <td>
+                    <input type="text" id="ShipName" name="ShipName" class="k-textbox" />
+                </td>
+            </tr>
+            <tr>
+                <td>訂單金額總計</td>
+                <td id="total" colspan="4"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="4">
+                    <input type="submit" value="存檔">
+                    <input id="back" type="button" onclick="location.href='./Index';" value="回前一頁" />
+                </td>
+            </tr>
+        </table>
+
+        <a onclick="AddNewDetail()" href="#">新增一筆</a>
+        <table class="table table-bordered">
+            <tr>
+                <td>商品</td>
+                <td>單價</td>
+                <td>數量</td>
+                <td>小計</td>
+                <td></td>
+            </tr>
+            <tbody id="detailContent">
+                @for (int i = 0; i < 1; i++)
+                {
+                    <tr>
+                        <td>@Html.DropDownListFor(model => Model.OrderDetails[i].ProductID, (List<SelectListItem>)ViewBag.productData, string.Empty, new {@class= "ProductID", @id="ProductID", onchange = "GetPrice(this)" })</td>
+                        <td>@Html.TextBoxFor(model => Model.OrderDetails[i].UnitPrice, new { @class = "k-textbox UnitPrice", @id = "UnitPrice", onchange = "ChangePrice(this)" })</td>
+                        <td>@Html.TextBoxFor(model => Model.OrderDetails[i].Qty, new { @class = "k-textbox Qty", onchange = "Count(this)" })</td>
+                        <td width="100px" class="count"></td>
+                        <td><button type="button" class="btnRemove">取消</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+<script>
+
+    $(".btnRemove").kendoButton();
+    $("#submitData").kendoButton();
+    $("#back").kendoButton();
+
+    $("#RequiredDate").kendoDatePicker();
+    $("#OrderDate").kendoDatePicker();
+    $("#ShippedDate").kendoDatePicker();
+
+    $(".ProductID").kendoComboBox();
+
+    //日期驗證
+    $(function () {
+        var container = $("#insertForm");
+        kendo.init(container);
+        container.kendoValidator({
+            rules: {
+                greaterdate: function (input) {
+                    if (input.is("[data-greaterdate-msg]") && input.val() != "") {
+                        var date = kendo.parseDate(input.val()),
+                            otherDate = kendo.parseDate($("[name='" + input.data("greaterdateField") + "']").val());
+                        return otherDate == null || otherDate.getTime() < date.getTime();
+                    }
+
+                    return true;
+                }
+            }
+        });
+    });
+
+    window.onload = function () {
+        $.ajax({
+            url: "/GetOrder/GetAllList",
+            type: "get",
+            dataType: "json",
+            success: function (Jdata) {
+                unitpriceArray = Jdata[4];
+
+                $("#EmployeeID").kendoComboBox({
+                    dataSource: Jdata[0],
+                    dataTextField: "Text",
+                    dataValueField: "Value",
+                });
+
+                $("#ShipperID").kendoComboBox({
+                    dataSource: Jdata[1],
+                    dataTextField: "Text",
+                    dataValueField: "Value",
+                });
+
+                $("#CustomerID").kendoComboBox({
+                    dataSource: Jdata[2],
+                    dataTextField: "Text",
+                    dataValueField: "Value",
+                });
+            }
+        });
+    };
+
+    function AddNewDetail() {
+        //明細資料範本
+        var trtemplate = $('#detailContent tr').eq(0).html();
+        //新增一列名資料
+        $('#detailContent').append('<tr>' + trtemplate + '</tr>');
+
+        //移除TR
+        $('#detailContent').on('click', '.btnRemove', function () {
+            $(this).closest('tr').remove();
+            Total();
+        });
+
+        for (var i = 0 ; i < $('#detailContent tr').length; i++) {
+            $('.ProductID').eq(i).attr('name', 'OrderDetails[' + i + '].ProductID');
+            $('.Qty').eq(i).attr('name', 'OrderDetails[' + i + '].Qty');
+            $('.UnitPrice').eq(i).attr('name', 'OrderDetails[' + i + '].UnitPrice');
+        }
+    }
+
+
+    function GetPrice(item) {
+        var price = [];
+        for (var i = 0; i < unitpriceArray.length; i++) {
+            price[i] = unitpriceArray[i].Value;
+        }
+        console.log(item);
+        $(item).closest('td').next('td').find('input').val(price[item.value - 1]);
+    }
+
+    function Count(item){
+        var unitprice = $(item).parent().prev('td').children().val();
+        var qty = $(item).closest("input:text").val();
+        var count = unitprice * qty;
+        $(item).parent().next('td').text(count);
+        Total(count);
+    }
+
+    function ChangePrice(item){
+        var unitprice = $(item).closest("input:text").val();
+        var qty = $(item).parent().next('td').children().val();
+        var total = unitprice * qty;
+        $(item).parent().next('td').next('td').text(total);
+        Total();
+    }
+
+    function Total(count){
+        var countArray = [];
+        var total = 0;
+        for(var i = 0;i < $('#detailContent tr').length; i++){
+            countArray[i] = parseInt($('.count').eq(i).text());
+            total += countArray[i];
+        }
+        console.log(total);
+        document.getElementById("total").innerHTML = total;
+    }
+
+</script>

@@ -1,83 +1,217 @@
-﻿
+﻿@model WebApplication1.Models.Order
+
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/_LayoutOorderPage.cshtml";
 }
-<script type="text/javascript">
-    var Submit = function () {
-        $.ajax({
-            url: "/GetOrder/Index",
-            type: "POST",
-            data: $('#orderForm').serialize(),
-            dataType: "JSON",
-            success: function (msg) {
-                $('#resultTable').children().remove();
-                $('#resultTable').append("<tr><td>訂單編號</td><td>客戶名稱</td><td>訂購日期</td><td>出貨日期</td></tr>");
-                var date;
-                $.each(msg, function (i, item) {
-                    date = new Date(parseInt(item.OrderDate.substr(6)));
-                    item.OrderDate = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-                    if (item.ShippedDate != null) {
-                        date = new Date(parseInt(item.ShippedDate.substr(6)));
-                        item.ShippedDate = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
-                    }
-                    $('#resultTable').append("<tr><td>" + item.OrderID + "</td><td>" + item.CustomerName +
-                                                "</td><td>" + item.OrderDate + "</td><td>" + item.ShippedDate + "</td></tr>");
-                });
-            },
-            error: function (xhr) {
-                alert(xhr.status);
-            }
-        });
-    }
-</script>
-
-<h3>訂單查詢</h3>
-<div class="container">
-    <form id="orderForm">
-        <table class="table table-bordered">
-            <tr>
-                <td>訂單編號</td>
-                <td colspan="4"><input type="text" id="OrderID" name="OrderID"></td>
-            </tr>
-            <tr>
-                <td>客戶名稱</td>
-                <td colspan="4"><input type="text" id="CustomerName" name="CustomerName"></td>
-            </tr>
-            <tr>
-                <td>負責員工</td>
-                <td colspan="4">
-                    @Html.DropDownList("EmployeeID", (List<SelectListItem>)ViewBag.empData, string.Empty)
-                </td>
-            </tr>
-            <tr>
-                <td>出貨公司</td>
-                <td colspan="4">
-                    @Html.DropDownList("ShipperID", (List<SelectListItem>)ViewBag.shipperData, string.Empty)
-                </td>
-            </tr>
-            <tr>
-                <td>訂購日期</td>
-                <td><input type="date" id="OrderDate" name="OrderDate"></td>
-                <td>出貨日期</td>
-                <td><input type="date" id="ShippedDate" name="ShippedDate"></td>
-            </tr>
-            <tr>
-                <td>需要日期</td>
-                <td colspan="4"><input type="date" id="RequireDate" name="RequireDate"></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td colspan="4">
-                    <input type="button" value="查詢" onclick="Submit()">
-                    <input type="reset" value="刪除">
-                    <button>新增訂單</button>
-                </td>
-            </tr>
-        </table>
-    </form>
-
-    <div>
-        <table id="resultTable" class="table table-bordered"></table>
+<!--show OrderData -->
+<div class="showOrder" id="showOrder">
+    <h3>訂單查詢</h3>
+    <form>
+    <table class="table table-bordered">
+        <tr>
+            <td>
+                訂單編號
+            </td>
+            <td colspan="4">
+                <input type="text" id="OrderID" name="OrderID" class="k-textbox" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                客戶名稱
+            </td>
+            <td colspan="4">
+                <input class="k-textbox" type="text" id="CustomerName" name="CustomerName" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                負責員工名稱
+            </td>
+            <td colspan="4">
+                <input type="text" id="EmployeeID" name="EmployeeID" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                出貨公司名稱
+            </td>
+            <td colspan="4">
+                <input type="text" id="ShipperID" name="ShipperID" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                訂單日期
+            </td>
+            <td>
+                <input type="text" data-role='datepicker' id="OrderDate" class="OrderDate" name="OrderDate" data-type="date" />
+            </td>
+            <td>
+                出貨日期
+            </td>
+            <td>
+                <input type="text" data-role='datepicker' id="ShippedDate" class="ShippedDate" name="ShippedDate" data-type="date" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                需要日期
+            </td>
+            <td colspan="4">
+                <input type="text" data-role='datepicker' id="RequiredDate" class="RequiredDate" name="RequiredDate" data-type="date" />
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td colspan="4">
+                <button id="submit" type="button">查詢</button>
+                <button id="resetbutton" tyqe="reset">清除</button>
+                <a id="insertpage" href="/GetOrder/InsertPage">新增訂單</a>
+            </td>
+        </tr>
+        
+    </table>
+        </form>
+    <div id="resultDiv" style="display:none">
+        <div id="resultTable">
+        </div>
     </div>
 </div>
+
+
+<script>
+
+    window.onload = function () {
+        $.ajax({
+            url: "/GetOrder/GetAllList",
+            type: "get",
+            dataType: "json",
+            success: function (Jdata) {
+                unitpriceArray = Jdata[4];
+
+                $("#EmployeeID").kendoComboBox({
+                    dataSource: Jdata[0],
+                    dataTextField: "Text",
+                    dataValueField: "Value",
+                });
+
+                $("#ShipperID").kendoComboBox({
+                    dataSource: Jdata[1],
+                    dataTextField: "Text",
+                    dataValueField: "Value",
+                });
+            }
+        });
+    };
+
+    $("#RequiredDate").kendoDatePicker();
+    $("#OrderDate").kendoDatePicker();
+    $("#ShippedDate").kendoDatePicker();
+    $('#insertpage').kendoButton();
+    $("#resetbutton").kendoButton();
+    $("#submit").kendoButton({
+        click: function (e) {
+            document.getElementById("resultDiv").style.display = "";
+            $("#resultTable").kendoGrid({
+                dataSource: {
+                    transport: {
+                        read: {
+                            url: "/GetOrder/GetData",
+                            type: "POST",
+                            dataType: "json",
+                            data: {
+                                OrderID: $("#OrderID").val(),
+                                CustomerName: $("#CustomerName").val(),
+                                EmployeeID: $("#EmployeeID").val(),
+                                ShipperID: $("#ShipperID").val(),
+                                OrderDate: $("#OrderDate").val(),
+                                ShippedDate: $("#ShippedDate").val(),
+                                RequiredDate: $("#RequiredDate").val(),
+                            }
+                        },
+                    },
+                    schema: {
+                        model: {
+                            fields: {
+                                OrderID: { type: "string" },
+                                CustomerName: { type: "string" },
+                                OrderDate: { type: "date" },
+                                ShippedDate: { type: "date" },
+                            }
+                        }
+                    },
+                    pageSize: 15
+                },
+                height: 550,
+                sortable: true,
+                reorderable: true,
+                resizable: true,
+                pageable: true,
+                columns: [
+                    {
+                        field: "OrderID",
+                        title: "OrderID",
+                    },
+                    {
+                        field: "CustomerName",
+                        title: "CustomerName"
+                    },
+                    {
+                        field: "OrderDate",
+                        title: "Order Date",
+                        format: "{0:MM/dd/yyyy}",
+                        width: 200
+                    },
+                    {
+                        field: "ShippedDate",
+                        title: "Shipped Date",
+                        format: "{0:MM/dd/yyyy}",
+                        width: 200
+                    },
+                   {
+                        command: [
+                        {
+                            name: "修改",
+                            click: function (e) {
+                                var tr = $(e.target).closest("tr");
+                                var data = this.dataItem(tr);
+                                ShowUpdateDetails(data.OrderID);
+                            }
+                        },
+                        {
+                            name: "刪除",
+                            click: function (e) {
+                                var tr = $(e.target).closest("tr"); 
+                                var data = this.dataItem(tr);
+                                DoDelete(data.OrderID);
+                            }
+                        },
+                       ]
+                   }
+
+                ]
+            });
+            $("#resultTable").data("kendoGrid").dataSource.read();
+            $('#resultTable').data('kendoGrid').refresh();
+        },
+    });
+
+    function ShowUpdateDetails(OrderID) {
+        window.location.href = "/GetOrder/UpdatePage?OrderID=" + OrderID ;
+    }
+
+    function DoDelete(OrderID) {
+        $.ajax({
+            url: "/GetOrder/DoDelete",
+            type: "Get",
+            data: { OrderID: OrderID },
+        });
+
+        $('#resultTable').on('click', '.deleteData', function () {
+            $(this).closest('tr').remove();
+        });
+    }
+
+</script>
