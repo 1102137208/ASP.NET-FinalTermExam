@@ -266,9 +266,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\Order.cs" />
-    <Compile Include="Models\OrderDetails.cs" />
-    <Compile Include="Models\OrderService.cs" />
+    <Compile Include="Models\Employee.cs" />
+    <Compile Include="Models\EmployeeService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -280,8 +279,6 @@
     <Content Include="Views\GetOrder\Index.cshtml" />
     <Content Include="Views\_LayoutOorderPage.cshtml" />
     <Content Include="scripts\jquery-1.9.1.min.map" />
-    <Content Include="Views\GetOrder\InsertPage.cshtml" />
-    <Content Include="Views\GetOrder\UpdatePage.cshtml" />
     <Content Include="scripts\jquery.min.map" />
     <Content Include="scripts\kendo.all.min.js.map" />
     <Content Include="scripts\kendo.angular.min.js.map" />

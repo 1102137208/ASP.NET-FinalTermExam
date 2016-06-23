@@ -1,104 +1,67 @@
-﻿@model WebApplication1.Models.Order
+﻿@model WebApplication1.Models.Employee
 
 @{
     ViewBag.Title = "Index";
     Layout = "~/Views/_LayoutOorderPage.cshtml";
 }
-<!--show OrderData -->
-<div class="showOrder" id="showOrder">
-    <h3>訂單查詢</h3>
-    <form>
-    <table class="table table-bordered">
-        <tr>
-            <td>
-                訂單編號
-            </td>
-            <td colspan="4">
-                <input type="text" id="OrderID" name="OrderID" class="k-textbox" />
-            </td>
-        </tr>
-        <tr>
-            <td>
-                客戶名稱
-            </td>
-            <td colspan="4">
-                <input class="k-textbox" type="text" id="CustomerName" name="CustomerName" />
-            </td>
-        </tr>
-        <tr>
-            <td>
-                負責員工名稱
-            </td>
-            <td colspan="4">
-                <input type="text" id="EmployeeID" name="EmployeeID" />
-            </td>
-        </tr>
-        <tr>
-            <td>
-                出貨公司名稱
-            </td>
-            <td colspan="4">
-                <input type="text" id="ShipperID" name="ShipperID" />
-            </td>
-        </tr>
-        <tr>
-            <td>
-                訂單日期
-            </td>
-            <td>
-                <input type="text" data-role='datepicker' id="OrderDate" class="OrderDate" name="OrderDate" data-type="date" />
-            </td>
-            <td>
-                出貨日期
-            </td>
-            <td>
-                <input type="text" data-role='datepicker' id="ShippedDate" class="ShippedDate" name="ShippedDate" data-type="date" />
-            </td>
-        </tr>
-        <tr>
-            <td>
-                需要日期
-            </td>
-            <td colspan="4">
-                <input type="text" data-role='datepicker' id="RequiredDate" class="RequiredDate" name="RequiredDate" data-type="date" />
-            </td>
-        </tr>
-        <tr>
-            <td></td>
-            <td colspan="4">
-                <button id="submit" type="button">查詢</button>
-                <button id="resetbutton" tyqe="reset">清除</button>
-                <a id="insertpage" href="/GetOrder/InsertPage">新增訂單</a>
-            </td>
-        </tr>
-        
-    </table>
-        </form>
-    <div id="resultDiv" style="display:none">
-        <div id="resultTable">
-        </div>
+<body>
+    <div>
+        <h2>查詢</h2>
+        <table>
+            <tr>
+                <td>員工編號</td>
+                <td>
+                    <input class="k-textbox" id="EmployeeID" type="text" />
+                </td>
+            </tr>
+            <tr>
+                <td>員工姓名</td>
+                <td>
+                    <input class="k-textbox" id="Name" type="text" />
+                </td>
+            </tr>
+            <tr>
+                <td>職稱</td>
+                <td>
+                    <input id="Job" type="text" />
+                </td>
+            </tr>
+            <tr>
+                <td>任職日期</td>
+                <td>
+                    <input class="k-textbox" id="StartDate"/>
+                </td>
+                <td>
+                    <input class="k-textbox" id="FinalDate" />
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td colspan="4">
+                    <button id="submit" type="button">查詢</button>
+                    <button id="resetbutton" tyqe="reset">清除</button>
+                    <a id="insertpage" href="/GetOrder/InsertPage">新增員工</a>
+                </td>
+            </tr>
+        </table>
     </div>
-</div>
-
+    <div id="resultDiv" style="display : none">
+        <table id="EmployeeList"></table>
+    </div>
+</body>
+</html>
 
 <script>
 
     window.onload = function () {
         $.ajax({
-            url: "/GetOrder/GetAllList",
+            url: "/aspnetFinalTermExam/employeeList",
             type: "get",
             dataType: "json",
             success: function (Jdata) {
-                unitpriceArray = Jdata[4];
 
-                $("#EmployeeID").kendoComboBox({
+                $("#Job").kendoComboBox({
                     dataSource: Jdata[0],
-                    dataTextField: "Text",
-                    dataValueField: "Value",
-                });
-
-                $("#ShipperID").kendoComboBox({
-                    dataSource: Jdata[1],
                     dataTextField: "Text",
                     dataValueField: "Value",
                 });
@@ -106,15 +69,13 @@
         });
     };
 
-    $("#RequiredDate").kendoDatePicker();
-    $("#OrderDate").kendoDatePicker();
-    $("#ShippedDate").kendoDatePicker();
-    $('#insertpage').kendoButton();
+    $("#StartDate").kendoDatePicker();
+    $("#FinalDate").kendoDatePicker();
     $("#resetbutton").kendoButton();
     $("#submit").kendoButton({
         click: function (e) {
             document.getElementById("resultDiv").style.display = "";
-            $("#resultTable").kendoGrid({
+            $("#EmployeeList").kendoGrid({
                 dataSource: {
                     transport: {
                         read: {
@@ -122,23 +83,21 @@
                             type: "POST",
                             dataType: "json",
                             data: {
-                                OrderID: $("#OrderID").val(),
-                                CustomerName: $("#CustomerName").val(),
                                 EmployeeID: $("#EmployeeID").val(),
-                                ShipperID: $("#ShipperID").val(),
-                                OrderDate: $("#OrderDate").val(),
-                                ShippedDate: $("#ShippedDate").val(),
-                                RequiredDate: $("#RequiredDate").val(),
+                                Name: $("#Name").val(),
+                                Job: $("#Job").val(),
+                                StartDate: $("#StartDate").val(),
+                                FinalDate: $("#FinalDate").val(),
                             }
                         },
                     },
                     schema: {
                         model: {
                             fields: {
-                                OrderID: { type: "string" },
-                                CustomerName: { type: "string" },
-                                OrderDate: { type: "date" },
-                                ShippedDate: { type: "date" },
+                                EmployeeID: { type: "string" },
+                                Name: { type: "string" },
+                                Job: { type: "string" },
+                                HireDate: { type: "date" },
                             }
                         }
                     },
@@ -151,25 +110,29 @@
                 pageable: true,
                 columns: [
                     {
-                        field: "OrderID",
-                        title: "OrderID",
+                        field: "EmployeeID",
+                        title: "EmployeeID",
                     },
                     {
-                        field: "CustomerName",
-                        title: "CustomerName"
+                        field: "Name",
+                        title: "Name"
                     },
                     {
-                        field: "OrderDate",
-                        title: "Order Date",
+                        field: "StartDate",
+                        title: "StartDate",
                         format: "{0:MM/dd/yyyy}",
                         width: 200
                     },
                     {
-                        field: "ShippedDate",
-                        title: "Shipped Date",
-                        format: "{0:MM/dd/yyyy}",
+                        field: "Gender",
+                        title: "Gendere",
                         width: 200
                     },
+                     {
+                         field: "Age",
+                         title: "Age",
+                         width: 200
+                     },
                    {
                         command: [
                         {
@@ -183,7 +146,7 @@
                         {
                             name: "刪除",
                             click: function (e) {
-                                var tr = $(e.target).closest("tr"); 
+                                var tr = $(e.target).closest("tr");
                                 var data = this.dataItem(tr);
                                 DoDelete(data.OrderID);
                             }
@@ -198,7 +161,7 @@
         },
     });
 
-    function ShowUpdateDetails(OrderID) {
+    /*function ShowUpdateDetails(OrderID) {
         window.location.href = "/GetOrder/UpdatePage?OrderID=" + OrderID ;
     }
 
@@ -212,6 +175,6 @@
         $('#resultTable').on('click', '.deleteData', function () {
             $(this).closest('tr').remove();
         });
-    }
+    }*/
 
 </script>

@@ -23,90 +23,38 @@ namespace WebApplication1.Controllers
 
         public JsonResult GetAllList()
         {
-            Models.OrderService orderService = new Models.OrderService();
+            Models.EmployeeService employeeService = new Models.EmployeeService();
 
 
-            List<Models.OrderDetails> ProductList = orderService.GetProductData();
+           
 
             List<SelectListItem> employeeList = new List<SelectListItem>();
-            List<SelectListItem> shipperList = new List<SelectListItem>();
-            List<SelectListItem> customerList = new List<SelectListItem>();
-            List<SelectListItem> productList = new List<SelectListItem>();
-            List<SelectListItem> unitpriceList = new List<SelectListItem>();
-            List<List<SelectListItem>> getAllData = new List<List<SelectListItem>>();
 
             //員工List
-            List<Models.Order> dataList = orderService.GetEmployeeData();
+            List<Models.Employee> dataList = employeeService.GetEmployeeData();
             foreach (var item in dataList)
             {
                 employeeList.Add(new SelectListItem()
                 {
-                    Text = item.EmployeeName,
+                    Text = item.Name,
                     Value = item.EmployeeID.ToString(),
                 });
             }
-            getAllData.Add(new List<SelectListItem>(employeeList));
 
-            //供應商List
-            dataList = orderService.GetShipperData();
-            foreach (var item in dataList)
-            {
-                shipperList.Add(new SelectListItem()
-                {
-
-                    Text = item.ShipperName,
-                    Value = item.ShipperID.ToString()
-                });
-            }
-            getAllData.Add(new List<SelectListItem>(shipperList));
-
-            ///客戶List
-            dataList = orderService.GetCustomerData();
-            foreach (var item in dataList)
-            {
-                customerList.Add(new SelectListItem()
-                {
-
-                    Text = item.CustomerName,
-                    Value = item.CustomerID.ToString()
-                });
-            }
-            getAllData.Add(new List<SelectListItem>(customerList));
-
-            //產品List
-            foreach (var item in ProductList)
-            {
-                productList.Add(new SelectListItem()
-                {
-                    Text = item.ProductName,
-                    Value = item.ProductID.ToString()
-                });
-            }
-            getAllData.Add(new List<SelectListItem>(productList));
-
-            //單價
-            ProductList = orderService.GetPriceData();
-            foreach (var item in ProductList)
-            {
-                unitpriceList.Add(new SelectListItem()
-                {
-                    Value = item.UnitPrice
-                });
-            }
-            getAllData.Add(new List<SelectListItem>(unitpriceList));
-
-            return this.Json(getAllData, JsonRequestBehavior.AllowGet);
+            return this.Json(employeeList, JsonRequestBehavior.AllowGet);
         }
+
+        /*
         /// <summary>
         /// 回傳訂單資料
         /// </summary>
         /// <param name="order"></param>
         /// <returns></returns>
         [HttpPost]
-        public JsonResult GetData(Order order)
+        public JsonResult GetData(Employee order)
         {
-            Models.OrderService orderService = new Models.OrderService();
-            List<Models.Order> list = orderService.SearchOrder(order);
+            Models.EmployeeService orderService = new Models.EmployeeService();
+            List<Models.Employee> list = orderService.SearchOrder(order);
             return this.Json(list);
         }
 
@@ -116,8 +64,7 @@ namespace WebApplication1.Controllers
         /// <returns></returns>
         public ActionResult InsertPage()
         {
-            Models.OrderService orderService = new Models.OrderService();
-            List<Models.OrderDetails> ProductList = orderService.GetProductData();
+            Models.EmployeeService orderService = new Models.EmployeeService();
             List<SelectListItem> productList = new List<SelectListItem>();
             //產品List
             foreach (var item in ProductList)
@@ -138,10 +85,10 @@ namespace WebApplication1.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult DoInsert(Models.Order order)
+        public ActionResult DoInsert(Models.Employee order)
         {
 
-            Models.OrderService orderService = new Models.OrderService();
+            Models.EmployeeService orderService = new Models.EmployeeService();
             orderService.InsertOrder(order);
             return RedirectToAction("Index");
         }
@@ -153,11 +100,11 @@ namespace WebApplication1.Controllers
         /// <returns></returns>
         public ActionResult UpdatePage(string OrderID)
         {
-            Models.OrderService orderService = new Models.OrderService();
+            Models.EmployeeService orderService = new Models.EmployeeService();
 
-            List<Models.Order> dataList = orderService.GetEmployeeData();
+            List<Models.Employee> dataList = orderService.GetEmployeeData();
             List<Models.OrderDetails> ProductList = orderService.GetProductData();
-            Models.Order order = orderService.GetOrderById(OrderID);
+            Models.Employee order = orderService.GetOrderById(OrderID);
             List<Models.OrderDetails> orderdetails = orderService.GetOrderDetialById(OrderID);
 
             List<SelectListItem> employeeList = new List<SelectListItem>();
@@ -261,8 +208,8 @@ namespace WebApplication1.Controllers
         /// <param name="order"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult DoUpdate(Models.Order order) {
-            Models.OrderService orderService = new Models.OrderService();
+        public ActionResult DoUpdate(Models.Employee order) {
+            Models.EmployeeService orderService = new Models.EmployeeService();
             orderService.UpdateOrderById(order);
             return RedirectToAction("Index");
         }
@@ -274,10 +221,10 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public ActionResult DoDelete(string OrderID)
         {
-            Models.OrderService orderService = new Models.OrderService();
+            Models.EmployeeService orderService = new Models.EmployeeService();
             orderService.DeleteOrderById(OrderID);
             return RedirectToAction("Index");
         }
-
+        */
     }
 }
